@@ -9,11 +9,17 @@ var Game = {
 
 		// Enemies
 		game.load.image('knight_red', './assets/images/knight_red.jpg');
+
+		// Sounds .ogg will NOT WORK WITH IE
+		game.load.audio('bgm_1', './assets/sounds/forrest_bgm_1.ogg')
 	},
 
 	create : function() {
 		// Things in here only happen when starting the state
 
+		bgm = game.add.audio('bgm_1');
+		bgm.loop = true;
+		bgm.play();
 		// Paint the background
 		game.add.tileSprite(0, 0, 800, 600, 'stage_1');
 		game.physics.startSystem(Phaser.Physics.Arcade);
@@ -28,6 +34,8 @@ var Game = {
 		player.anchor.setTo(.5,.5);
 		player.body.collideWorldBounds = true;
 		player.body.enable = true;
+		player.canAttack = true;
+		player.attackCooldown = 100;
 		
 
 		// Spawn First Enemy
@@ -36,11 +44,25 @@ var Game = {
 
 	update : function() {
 		//Things in here at about 60 FPS
-		if(game.physics.arcade.collide(player, enemy))
+		if(game.physics.arcade.collide(player, enemy) && player.canAttack)
 		{
+			// Play Attack Animation
+
+
+			// Deal Damage
 			var damage = game.add.text(enemy.x,enemy.y, 10);
-			damage.lifespan = 1000;
+			damage.lifespan = 200;
 			enemy.health = enemy.health - 10;
+
+			// Attack Cooldown
+			player.canAttack = false;
+			game.time.events.add(player.attackCooldown, 
+									(function() {
+										player.canAttack = true;
+										}),
+									this
+								);
+
 			if (enemy.health < 0) { enemy.destroy() };
 		}
 		// Look to see if you're clicking something other than yourself
@@ -59,6 +81,7 @@ var Game = {
 			player.body.velocity.setTo(0, 0);
 		}
 
+		// Spawn an enemy if one doesn't exist already
 		if (!enemy.exists){
 			enemy = ai.randomSpawn();
 		}
