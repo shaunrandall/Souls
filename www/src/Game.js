@@ -1,7 +1,7 @@
 var player, enemy;
 
 // create BasicGame Class
-Souls = {
+var Souls = {
 
 };
 
@@ -75,7 +75,7 @@ Souls.Game.prototype = {
     create: function () {        
 		// Things in here only happen when starting the state
 
-		bgm = this.add.audio('bgm_1');
+        var bgm = this.add.audio('bgm_1');
 		bgm.loop = true;
 		//bgm.play();
 		// Paint the background
@@ -124,16 +124,15 @@ Souls.Game.prototype = {
 			if (enemy.health < 0) { enemy.destroy(); }
 		}
 		// Look to see if you're clicking something other than yourself
-		if (this.input.pointer1.isDown
-			&& !Phaser.Rectangle.contains(player.body, this.input.x, this.input.y)
+		if (this.input.pointer1.isDown && 
+            !Phaser.Rectangle.contains(player.body, this.input.x, this.input.y)
 			)
 		{
 			// Move!
 			this.physics.arcade.moveToPointer(player, 200);
 		}
-		else if (this.input.mousePointer.isDown
-			    && Phaser.Rectangle.contains(player.body, this.input.x, this.input.y)
-			    || Phaser.Rectangle.contains(player.body, this.input.pointer1.positionUp.x, this.input.pointer1.positionUp.y))
+		else if (this.input.mousePointer.isDown && Phaser.Rectangle.contains(player.body, this.input.x, this.input.y) ||
+                 Phaser.Rectangle.contains(player.body, this.input.pointer1.positionUp.x, this.input.pointer1.positionUp.y))
 		{
 			// Stop moving because you clicked on yourself or got to position
 			player.body.velocity.setTo(0, 0);
