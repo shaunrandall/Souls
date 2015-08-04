@@ -5,5 +5,6 @@ import (
 )
 
 var Handlers = map [string]jswebsocket.Handler {
-	"login": jswebsocket.Handler { loginResponse, func() interface{} { return &loginMessage{} } },
+	"login": jswebsocket.Handler { loginHandler, func() interface{} { return &loginRecv{} } },
+	"move": jswebsocket.Handler { playerMoveHandler, func() interface{} { return &playerMoveRecv{} } },
 }

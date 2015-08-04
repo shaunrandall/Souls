@@ -6,6 +6,7 @@ package jswebsocket
 
 import (
     "github.com/gorilla/websocket"
+    "encoding/json"
     "time"
 )
 
@@ -35,6 +36,8 @@ type Connection struct {
 
     // Buffered channel of outbound messages.
     send chan []byte
+
+    User interface{}
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -52,6 +55,19 @@ func (c *Connection) readPump() {
             break
         }
         messageReceive(c, message)
+    }
+}
+
+// message is a fancy wrapper for write
+func (c *Connection) Message(name string, payload interface{}, broadcast bool) {
+    jsonOut, _ := json.Marshal(payload)
+    messageBytes := append([]byte(name), []byte("|")...)
+    messageBytes = append(messageBytes, jsonOut...)
+
+    if broadcast {
+        h.broadcast <- messageBytes
+    } else {
+        c.send <- messageBytes
     }
 }
 

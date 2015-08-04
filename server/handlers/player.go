@@ -10,16 +10,14 @@ import (
 // Login
 // --------------------------------------------------- //
 
-type loginRecv struct {
-	Username string `json:username`
-	Password string `json:password`
+type playerMoveRecv struct {
+	X int `json:x`
+	Y int `json:y`
 }
-type loginResp struct {
-}
-var loginHandler = func(connection *jswebsocket.Connection, stream interface{}) {
-	message := stream.(*loginRecv)
-	log.Print("login", message)
-	log.Print("user", connection.User)
+var playerMoveHandler = requirePlayer(func(connection *jswebsocket.Connection, stream interface{}) {
+	message := stream.(*playerMoveRecv)
+	player := connection.User.(*players.Player)
+	log.Print("move", message)
 
 	// If the connection has a user, error
 	if connection.User != nil {
@@ -29,11 +27,10 @@ var loginHandler = func(connection *jswebsocket.Connection, stream interface{}) 
 
 	player := players.Player{
 		Name: message.Username,
-		Connection: connection,
 	}
 	player.Register()
 
 	// TODO: not thread safe
 	connection.User = &player
-	connection.Message("login", &loginResp{})
-}
+	connection.Message("login", &loginMessageResp{})
+})
